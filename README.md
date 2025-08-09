@@ -72,14 +72,16 @@ http://127.0.0.1:5000
 For Software:
 
 # Screenshots (Add at least 3)
-![Screenshot1](Add screenshot 1 here with proper name)
-*Add caption explaining what this shows*
+![login page](photos/login_page.png)
+*Smile to enter – the only login system where showing teeth gets you access.*
 
-![Screenshot2](Add screenshot 2 here with proper name)
-*Add caption explaining what this shows*
+![homepage](photos/home_page.png)
+*The useless control center: buttons that lead to even more useless fun.* 
 
-![Screenshot3](Add screenshot 3 here with proper name)
-*Add caption explaining what this shows*
+![video blinking](photos/video%20blinking.png)
+*A video player that refuses to work unless your eyes are closed. Reverse productivity at its finest.*  
+![watch detection](photos/watch_detection.png)
+*A draggable watch that finally answers the question “What time is it?” in the weirdest way possible.*  
 
 # Diagrams
 ![Workflow](Add your workflow/architecture diagram here)
@@ -106,15 +108,16 @@ For Hardware:
 
 ### Project Demo
 # Video
-[Add your demo video link here]
+[video/demo_video.mp4]
 *Explain what the video demonstrates*
 
 # Additional Demos
-[Add any extra demo materials/links]
+
+[video/demo_2.mp4]
 
 ## Team Contributions
-- [Name 1]: [Specific contributions]
-- [Name 2]: [Specific contributions]
+- [manu]: [open cv]
+- [abhishek]: [ui integration]
 - [Name 3]: [Specific contributions]
 
 ---
