@@ -351,6 +351,11 @@ def serve_pucham_image():
     """Serve the pucham.jpeg image used in the watch detector page"""
     return send_from_directory(app.root_path, 'pucham.jpeg')
 
+@app.route('/monkey.webp')
+def serve_monkey_image():
+    """Serve the monkey.webp used for login preview"""
+    return send_from_directory(app.root_path, 'monkey.webp')
+
 @app.route('/video_feed')
 def video_feed():
     """Video streaming route"""
