@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eye Detection - Real Time Blink Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .video-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #videoStream {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .no-video {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-danger {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .stats-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            height: fit-content;
+        }
+
+        .stats-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        .status-open {
+            background-color: #27ae60;
+            animation: pulse 2s infinite;
+        }
+
+        .status-closed {
+            background-color: #e74c3c;
+            animation: pulse 2s infinite;
+        }
+
+        .status-inactive {
+            background-color: #95a5a6;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👁️ Eye Detection & Blink Tracker</h1>
+            <p>Real-time eye blink detection using OpenCV and Flask</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div class="main-content">
+            <div class="video-section">
+                <div class="video-container">
+                    <img id="videoStream" src="" alt="Video Stream">
+                    <div class="no-video" id="noVideoMessage">
+                        <h3>No video stream active</h3>
+                        <p>Start webcam or upload a video to begin eye detection</p>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn" id="startWebcam">📷 Start Webcam</button>
+                    <button class="btn btn-danger" id="stopStream" disabled>⏹️ Stop Stream</button>
+                    
+                    <div class="file-input-wrapper">
+                        <input type="file" id="videoFile" accept="video/*">
+                        <label for="videoFile" class="btn">📁 Upload Video</label>
+                    </div>
+                    
+                    <button class="btn" id="resetStats">🔄 Reset Stats</button>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <h2 class="stats-title">📊 Live Statistics</h2>
+                
+                <div class="stat-item">
+                    <span class="stat-label">Total Blinks</span>
+                    <span class="stat-value" id="blinkCount">0</span>
+                </div>
+                
+                <div class="stat-item">
+                    <span class="stat-label">Eye Status</span>
+                    <span class="stat-value" id="eyeStatus">
+                        Inactive
+                        <span class="status-indicator status-inactive" id="statusIndicator"></span>
+                    </span>
+                </div>
+                
+                <div class="stat-item">
+                    <span class="stat-label">Stream Status</span>
+                    <span class="stat-value" id="streamStatus">Stopped</span>
+                </div>
+                
+                <div class="stat-item">
+                    <span class="stat-label">Video Source</span>
+                    <span class="stat-value" id="videoSource">None</span>
+                </div>
+                
+                <div class="stat-item">
+                    <span class="stat-label">Face Detected</span>
+                    <span class="stat-value" id="faceDetected">No</span>
+                </div>
+                
+                <div class="stat-item">
+                    <span class="stat-label">Debug Counters</span>
+                    <span class="stat-value" id="debugCounters">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>💡 <strong>How it works:</strong> When your eyes are OPEN, the video is HIDDEN (black screen). When your eyes are CLOSED, the video is VISIBLE.</p>
+            <p>📹 <strong>Video Mode:</strong> Upload a video and sit in front of your webcam to control it with your eyes!</p>
+            <p>🎥 <strong>Webcam overlay:</strong> Small window shows your webcam feed with eye detection rectangles.</p>
+            <p>Built with Flask, OpenCV, and modern web technologies</p>
+        </div>
+    </div>
+
+    <script>
+        let isStreaming = false;
+        let statsInterval;
+
+        // DOM elements
+        const videoStream = document.getElementById('videoStream');
+        const noVideoMessage = document.getElementById('noVideoMessage');
+        const startWebcamBtn = document.getElementById('startWebcam');
+        const stopStreamBtn = document.getElementById('stopStream');
+        const videoFileInput = document.getElementById('videoFile');
+        const resetStatsBtn = document.getElementById('resetStats');
+        const alertContainer = document.getElementById('alertContainer');
+
+        // Stat elements
+        const blinkCount = document.getElementById('blinkCount');
+        const eyeStatus = document.getElementById('eyeStatus');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const streamStatus = document.getElementById('streamStatus');
+        const videoSource = document.getElementById('videoSource');
+        const faceDetected = document.getElementById('faceDetected');
+        const debugCounters = document.getElementById('debugCounters');
+
+        // Utility functions
+        function showAlert(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function updateControls(streaming) {
+            isStreaming = streaming;
+            startWebcamBtn.disabled = streaming;
+            stopStreamBtn.disabled = !streaming;
+            
+            if (streaming) {
+                videoStream.style.display = 'block';
+                noVideoMessage.style.display = 'none';
+                videoStream.src = '/video_feed?' + new Date().getTime();
+                startStatsUpdate();
+            } else {
+                videoStream.style.display = 'none';
+                noVideoMessage.style.display = 'block';
+                videoStream.src = '';
+                stopStatsUpdate();
+            }
+        }
+
+        function startStatsUpdate() {
+            if (statsInterval) clearInterval(statsInterval);
+            
+            statsInterval = setInterval(async () => {
+                try {
+                    const response = await fetch('/stats');
+                    const stats = await response.json();
+                    
+                    blinkCount.textContent = stats.blink_count;
+                    streamStatus.textContent = stats.is_streaming ? 'Active' : 'Stopped';
+                    videoSource.textContent = stats.video_source || 'None';
+                    faceDetected.textContent = stats.face_detected ? 'Yes' : 'No';
+                    debugCounters.textContent = `Open:${stats.eye_open_counter} Closed:${stats.eye_closed_counter}`;
+                    
+                    if (stats.eyes_closed) {
+                        eyeStatus.innerHTML = 'Closed <span class="status-indicator status-closed" id="statusIndicator"></span>';
+                    } else {
+                        eyeStatus.innerHTML = 'Open <span class="status-indicator status-open" id="statusIndicator"></span>';
+                    }
+                    
+                    if (!stats.is_streaming) {
+                        updateControls(false);
+                    }
+                } catch (error) {
+                    console.error('Error fetching stats:', error);
+                }
+            }, 100); // Update every 100ms for real-time feel
+        }
+
+        function stopStatsUpdate() {
+            if (statsInterval) {
+                clearInterval(statsInterval);
+                statsInterval = null;
+            }
+            
+            // Reset stats display
+            blinkCount.textContent = '0';
+            eyeStatus.innerHTML = 'Inactive <span class="status-indicator status-inactive"></span>';
+            streamStatus.textContent = 'Stopped';
+            videoSource.textContent = 'None';
+            faceDetected.textContent = 'No';
+            debugCounters.textContent = '-';
+        }
+
+        // Event listeners
+        startWebcamBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/start_webcam', { method: 'POST' });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showAlert('Webcam started successfully!');
+                    updateControls(true);
+                } else {
+                    showAlert('Failed to start webcam', 'error');
+                }
+            } catch (error) {
+                showAlert('Error starting webcam: ' + error.message, 'error');
+            }
+        });
+
+        stopStreamBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/stop_stream', { method: 'POST' });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showAlert('Stream stopped successfully!');
+                    updateControls(false);
+                } else {
+                    showAlert('Failed to stop stream', 'error');
+                }
+            } catch (error) {
+                showAlert('Error stopping stream: ' + error.message, 'error');
+            }
+        });
+
+        videoFileInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('video', file);
+
+            try {
+                showAlert('Uploading video...', 'success');
+                const response = await fetch('/upload_video', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showAlert(result.message);
+                    updateControls(true);
+                } else {
+                    showAlert(result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Error uploading video: ' + error.message, 'error');
+            }
+        });
+
+        resetStatsBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/reset_stats', { method: 'POST' });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showAlert('Statistics reset successfully!');
+                } else {
+                    showAlert('Failed to reset statistics', 'error');
+                }
+            } catch (error) {
+                showAlert('Error resetting statistics: ' + error.message, 'error');
+            }
+        });
+
+        // Initialize the page
+        updateControls(false);
+    </script>
+</body>
+</html>
