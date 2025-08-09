@@ -108,12 +108,12 @@ For Hardware:
 
 ### Project Demo
 # Video
-[video/n1.mp4]
+![video demo](video/n1.mp4)
 *Explain what the video demonstrates*
 
 # Additional Demos
 
-[video/n2.mp4]
+![video](video/n2.mp4)
 
 ## Team Contributions
 - [manu]: [open cv]
