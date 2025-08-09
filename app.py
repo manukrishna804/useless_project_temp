@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, request, jsonify
+from flask import Flask, render_template, Response, request, jsonify, redirect, url_for, session
 import cv2
 import numpy as np
 import threading
@@ -9,13 +9,15 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max file size
+app.secret_key = 'your-secret-key-here-change-in-production'  # Required for sessions
 
 # Create uploads directory if it doesn't exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# Load the pre-trained face and eye cascade classifiers
+# Load the pre-trained face, eye, and smile cascade classifiers
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
+smile_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_smile.xml')
 
 class EyeDetector:
     def __init__(self):
@@ -140,6 +142,70 @@ class EyeDetector:
 # Global eye detector instance
 eye_detector = EyeDetector()
 
+class SmileDetector:
+    def __init__(self):
+        self.smile_threshold = 0.6  # Confidence threshold for smile detection
+        self.required_smiles = 3  # Number of consecutive smile detections required
+        self.smile_counter = 0
+        self.no_smile_counter = 0
+        self.is_detecting = False
+        self.cap = None
+        
+    def detect_smile(self, frame):
+        """Detect smile in the given frame"""
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        
+        # Detect faces
+        faces = face_cascade.detectMultiScale(gray, 1.1, 4, minSize=(30, 30))
+        
+        smile_detected = False
+        
+        for (x, y, w, h) in faces:
+            # Draw rectangle around face
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+            
+            # Region of interest for face
+            roi_gray = gray[y:y+h, x:x+w]
+            roi_color = frame[y:y+h, x:x+w]
+            
+            # Detect smile in the face region
+            smiles = smile_cascade.detectMultiScale(roi_gray, 1.7, 20, minSize=(25, 25))
+            
+            if len(smiles) > 0:
+                smile_detected = True
+                # Draw rectangle around smile
+                for (sx, sy, sw, sh) in smiles:
+                    cv2.rectangle(roi_color, (sx, sy), (sx+sw, sy+sh), (0, 255, 0), 2)
+                    cv2.putText(roi_color, 'SMILE!', (sx, sy-10), 
+                               cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+        
+        # Update smile counters
+        if smile_detected:
+            self.smile_counter += 1
+            self.no_smile_counter = 0
+        else:
+            self.no_smile_counter += 1
+            if self.no_smile_counter > 5:  # Reset smile counter if no smile for too long
+                self.smile_counter = 0
+        
+        return frame, smile_detected
+    
+    def is_happy(self):
+        """Check if enough smiles have been detected"""
+        return self.smile_counter >= self.required_smiles
+    
+    def reset(self):
+        """Reset smile detection counters"""
+        self.smile_counter = 0
+        self.no_smile_counter = 0
+        self.is_detecting = False
+        if self.cap:
+            self.cap.release()
+            self.cap = None
+
+# Global smile detector instance
+smile_detector = SmileDetector()
+
 def generate_frames_webcam():
     """Generate frames from webcam"""
     cap = cv2.VideoCapture(0)
@@ -247,8 +313,20 @@ def generate_frames_video(video_path):
         webcam_cap.release()
 
 @app.route('/')
+def index():
+    """Redirect to login page"""
+    return redirect(url_for('login'))
+
+@app.route('/login')
+def login():
+    """Login page with smile detection"""
+    return render_template('login.html')
+
+@app.route('/home')
 def home():
-    """Home page with project showcase"""
+    """Home page with project showcase - requires login"""
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
     return render_template('home.html')
 
 @app.route('/eye-detection')
@@ -324,6 +402,74 @@ def reset_stats():
     """Reset eye detection statistics"""
     eye_detector.reset_stats()
     return jsonify({'status': 'success', 'message': 'Statistics reset'})
+
+@app.route('/smile_check', methods=['POST'])
+def smile_check():
+    """Check for smile using webcam"""
+    try:
+        # Reset smile detector
+        smile_detector.reset()
+        
+        # Open webcam
+        cap = cv2.VideoCapture(0)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        
+        if not cap.isOpened():
+            return jsonify({'success': False, 'message': 'Could not open camera'})
+        
+        smile_detector.is_detecting = True
+        smile_detector.cap = cap
+        
+        # Check for smile for up to 10 seconds
+        start_time = time.time()
+        max_duration = 10  # seconds
+        
+        while smile_detector.is_detecting and (time.time() - start_time) < max_duration:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            
+            # Flip frame for mirror effect
+            frame = cv2.flip(frame, 1)
+            
+            # Detect smile
+            processed_frame, smile_detected = smile_detector.detect_smile(frame)
+            
+            # Add status text
+            status_text = f"Smiles: {smile_detector.smile_counter}/{smile_detector.required_smiles}"
+            cv2.putText(processed_frame, status_text, (20, 50), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+            
+            # Check if enough smiles detected
+            if smile_detector.is_happy():
+                smile_detector.is_detecting = False
+                break
+            
+            # Small delay
+            time.sleep(0.1)
+        
+        # Clean up
+        cap.release()
+        smile_detector.is_detecting = False
+        smile_detector.cap = None
+        
+        # Check result
+        if smile_detector.is_happy():
+            session['logged_in'] = True
+            return jsonify({'success': True, 'message': 'Smile detected! Welcome!'})
+        else:
+            return jsonify({'success': False, 'message': 'Please smile 😁'})
+            
+    except Exception as e:
+        print(f"Error in smile detection: {e}")
+        return jsonify({'success': False, 'message': 'Error during smile detection'})
+
+@app.route('/logout')
+def logout():
+    """Logout user"""
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(debug=True, threaded=True)
