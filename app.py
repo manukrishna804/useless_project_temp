@@ -247,8 +247,13 @@ def generate_frames_video(video_path):
         webcam_cap.release()
 
 @app.route('/')
-def index():
-    """Main page"""
+def home():
+    """Home page with project showcase"""
+    return render_template('home.html')
+
+@app.route('/eye-detection')
+def eye_detection_app():
+    """Eye detection application page"""
     return render_template('index.html')
 
 @app.route('/video_feed')
