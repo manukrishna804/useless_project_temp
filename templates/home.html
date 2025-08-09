@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🤪 Manu's Useless Project Collection</title>
+    <title>🤪 അങ്ങനെ അങ്ങ് വിലസണ്ട
+    </title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&family=Fredoka+One&display=swap');
         
@@ -315,6 +316,14 @@
     </style>
 </head>
 <body>
+    {% if smile_image_url %}
+    <div style="position: fixed; top: 20px; left: 20px; z-index: 2000;">
+        <div style="display: flex; align-items: center; gap: 18px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 14px 18px; border-radius: 999px; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 8px 20px rgba(0,0,0,0.25);">
+            <img src="{{ smile_image_url }}" alt="Your smile" style="width: 200px; height: 200px; object-fit: cover; border-radius: 50%; border: 4px solid #fff;">
+            <div style="color: #fff; font-weight: 800; font-size: 1.2rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.4);">Nice Smile! 😄</div>
+        </div>
+    </div>
+    {% endif %}
     <div class="floating-emojis">
         <div class="emoji" style="left: 10%; animation-delay: -0.5s;">👁️</div>
         <div class="emoji" style="left: 20%; animation-delay: -1.5s;">🤖</div>
@@ -329,7 +338,8 @@
 
     <div class="container">
         <div class="header">
-            <h1 class="title">🤪 Manu's Useless Projects</h1>
+            <h1 class="title">🤪അങ്ങനെ അങ്ങ് വിലസണ്ട
+            </h1>
             <p class="subtitle">Where Productivity Goes to Die! 💀</p>
             <p style="color: #fff; font-size: 1rem; margin-bottom: 10px; opacity: 0.8;">
                 😊 Logged in with your beautiful smile!
@@ -458,7 +468,7 @@
         <div class="footer">
             <p class="footer-text">
                 🎉 Made with 💚 and way too much caffeine ☕<br>
-                "If it's not completely useless, it's not worth building!" - Manu, probably
+                "If it's not completely useless, it's not worth building!"
             </p>
             <div class="social-links">
                 <a href="#" class="social-link">🐱</a>

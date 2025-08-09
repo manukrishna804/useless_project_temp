@@ -327,7 +327,12 @@ def home():
     """Home page with project showcase - requires login"""
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-    return render_template('home.html')
+    smile_filename = session.get('smile_image')
+    smile_image_url = (
+        url_for('uploaded_file', filename=smile_filename)
+        if smile_filename else None
+    )
+    return render_template('home.html', smile_image_url=smile_image_url)
 
 @app.route('/eye-detection')
 def eye_detection_app():
@@ -415,6 +420,11 @@ def reset_stats():
     eye_detector.reset_stats()
     return jsonify({'status': 'success', 'message': 'Statistics reset'})
 
+@app.route('/uploads/<path:filename>')
+def uploaded_file(filename):
+    """Serve files from the uploads directory"""
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 @app.route('/smile_check', methods=['POST'])
 def smile_check():
     """Check for smile using webcam"""
@@ -437,6 +447,7 @@ def smile_check():
         start_time = time.time()
         max_duration = 10  # seconds
         
+        saved_frame = None
         while smile_detector.is_detecting and (time.time() - start_time) < max_duration:
             ret, frame = cap.read()
             if not ret:
@@ -455,6 +466,7 @@ def smile_check():
             
             # Check if enough smiles detected
             if smile_detector.is_happy():
+                saved_frame = frame.copy()
                 smile_detector.is_detecting = False
                 break
             
@@ -468,6 +480,15 @@ def smile_check():
         
         # Check result
         if smile_detector.is_happy():
+            # Save smiling image
+            filename = f"smile_{int(time.time())}.jpg"
+            save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            try:
+                if saved_frame is not None:
+                    cv2.imwrite(save_path, saved_frame)
+                    session['smile_image'] = filename
+            except Exception as e:
+                print(f"Error saving smile image: {e}")
             session['logged_in'] = True
             return jsonify({'success': True, 'message': 'Smile detected! Welcome!'})
         else:
