@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>⌚ Watch Time Detector 3000™</title>
+    <meta charset="UTF-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Neue', cursive;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
+            background-size: 400% 400%;
+            animation: gradientFlow 8s ease infinite;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        @keyframes gradientFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 3px solid rgba(118, 75, 162, 0.3);
+        }
+        
+        .title {
+            font-size: 3rem;
+            color: #4a4a4a;
+            margin: 0 0 15px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: titlePulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: #666;
+            font-style: italic;
+            margin: 0;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+        }
+        
+        .upload-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 3px dashed #667eea;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-section.dragover {
+            border-color: #f5576c;
+            background: rgba(245, 87, 108, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .upload-area {
+            text-align: center;
+            padding: 60px 20px;
+            cursor: pointer;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .upload-area:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            border-color: #667eea;
+            transform: translateY(-5px);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: iconBob 2s ease-in-out infinite;
+        }
+        
+        @keyframes iconBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .upload-title {
+            font-size: 2rem;
+            color: #4a4a4a;
+            margin: 0 0 15px 0;
+            font-weight: bold;
+        }
+        
+        .upload-subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin: 0 0 30px 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+        }
+        
+        .feature-emoji {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #4a4a4a;
+            margin: 0 0 10px 0;
+        }
+        
+        .feature-desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.6);
+        }
+        
+        .tips-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+            border-left: 5px solid #f5576c;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .tips-title {
+            font-size: 1.5rem;
+            color: #f5576c;
+            margin: 0 0 20px 0;
+            font-weight: bold;
+        }
+        
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .tip-item {
+            background: rgba(245, 87, 108, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #4a4a4a;
+        }
+        
+        .loading-section {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 50px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 1.3rem;
+            color: #667eea;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .loading-message {
+            font-size: 1rem;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .results-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            margin: 30px 0;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border-left: 5px solid #00b894;
+        }
+        
+        .time-display {
+            font-size: 4rem;
+            color: #00b894;
+            font-weight: bold;
+            text-align: center;
+            margin: 30px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .confidence-container {
+            margin: 30px 0;
+        }
+        
+        .confidence-bar {
+            width: 100%;
+            height: 40px;
+            background: #ecf0f1;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: width 2s ease;
+        }
+        
+        .excuse-box {
+            background: rgba(245, 87, 108, 0.1);
+            border: 2px solid #f5576c;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .excuse-title {
+            font-size: 1.3rem;
+            color: #f5576c;
+            font-weight: bold;
+            margin: 0 0 15px 0;
+        }
+        
+        .excuse-text {
+            color: #4a4a4a;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .technical-box {
+            background: rgba(118, 75, 162, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+        }
+        
+        .technical-title {
+            font-size: 1.2rem;
+            color: #764ba2;
+            font-weight: bold;
+            margin: 0 0 20px 0;
+            font-family: 'Comic Neue', cursive;
+        }
+        
+        .disclaimer {
+            background: rgba(149, 165, 166, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .image-preview {
+            text-align: center;
+            margin: 30px 0;
+            padding: 25px;
+            background: rgba(118, 75, 162, 0.1);
+            border-radius: 15px;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        /* Drag and drop styles */
+        .drag-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(102, 126, 234, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .drag-content {
+            text-align: center;
+            color: white;
+            font-size: 3rem;
+            font-weight: bold;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .title { font-size: 2.5rem; }
+            .upload-icon { font-size: 3rem; }
+            .upload-title { font-size: 1.5rem; }
+            .time-display { font-size: 3rem; }
+            .features-grid { grid-template-columns: 1fr; }
+            .tips-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Drag overlay -->
+    <div class="drag-overlay" id="dragOverlay">
+        <div class="drag-content">
+            📸 Drop your watch photo here! 🕐
+        </div>
+    </div>
+
+    <a href="/" class="back-btn">← Back</a>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">⌚ Watch Time Detector 3000™</h1>
+            <p class="subtitle">"Because reading analog clocks is SO last century!"</p>
+        </div>
+        
+        <!-- Upload Section -->
+        <div class="upload-section" id="uploadSection">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()" id="uploadArea">
+                <div class="upload-icon">📸</div>
+                <h2 class="upload-title">Drop Your Watch Photo Here!</h2>
+                <p class="upload-subtitle">Or click to browse files</p>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <span class="feature-emoji">✨</span>
+                        <div class="feature-title">Instant Magic</div>
+                        <p class="feature-desc">AI-powered confusion in seconds!</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-emoji">🎭</span>
+                        <div class="feature-title">Epic Fails</div>
+                        <p class="feature-desc">Guaranteed spectacular misinterpretation!</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-emoji">🎪</span>
+                        <div class="feature-title">Pure Entertainment</div>
+                        <p class="feature-desc">Results so wrong they're hilarious!</p>
+                    </div>
+                </div>
+                
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                    🎯 Choose Image & Embrace Chaos
+                </button>
+            </div>
+            
+            <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="uploadImage()">
+        </div>
+        
+        <!-- Tips Section -->
+        <div class="tips-section">
+            <h3 class="tips-title">🎨 Pro Tips for Maximum Chaos</h3>
+            <div class="tips-grid">
+                <div class="tip-item">
+                    <strong>📷 Blurry Photos:</strong> Activates "Artistic Interpretation Mode"
+                </div>
+                <div class="tip-item">
+                    <strong>🌅 Dramatic Lighting:</strong> Enhances AI confusion algorithms
+                </div>
+                <div class="tip-item">
+                    <strong>📐 Impossible Angles:</strong> Triggers quantum physics analysis
+                </div>
+                <div class="tip-item">
+                    <strong>🔍 Extreme Close-ups:</strong> Microscopic time detection activated
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading Section -->
+        <div class="loading-section" id="loadingSection">
+            <div class="spinner"></div>
+            <div class="loading-text">🔬 Advanced AI Processing</div>
+            <div class="loading-message" id="loadingMessage">Consulting with digital spirit guides...</div>
+        </div>
+        
+        <!-- Results Section -->
+        <div id="resultsSection"></div>
+    </div>
+    
+    <script>
+        const loadingMessages = [
+            "🔮 Channeling ancient clockmaker spirits...",
+            "⚡ Converting temporal chaos into digital magic...",
+            "🎭 Interrogating your watch with advanced psychology...",
+            "🔧 Debugging the fundamental laws of time...",
+            "🌈 Translating analog gibberish into digital nonsense...",
+            "🤝 Negotiating peace with rebellious clock hands...",
+            "🧙‍♂️ Consulting the Oracle of Timekeeping Wisdom...",
+            "🎪 Teaching AI to count past 12 (still struggling)...",
+            "🌮 Bribing the watch with virtual tacos..."
+        ];
+        
+        // Drag and drop functionality
+        let dragCounter = 0;
+        
+        document.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            dragCounter++;
+            document.getElementById('dragOverlay').style.display = 'flex';
+        });
+        
+        document.addEventListener('dragleave', (e) => {
+            dragCounter--;
+            if (dragCounter === 0) {
+                document.getElementById('dragOverlay').style.display = 'none';
+            }
+        });
+        
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragCounter = 0;
+            document.getElementById('dragOverlay').style.display = 'none';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    processFile(file);
+                } else {
+                    alert('🚨 Invalid file type! I can only disappoint you with image files!');
+                }
+            }
+        });
+        
+        // Upload area visual feedback
+        const uploadArea = document.getElementById('uploadArea');
+        const uploadSection = document.getElementById('uploadSection');
+        
+        uploadArea.addEventListener('dragenter', (e) => {
+            e.stopPropagation();
+            uploadSection.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.stopPropagation();
+            uploadSection.classList.remove('dragover');
+        });
+        
+        function uploadImage() {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length > 0) {
+                processFile(fileInput.files[0]);
+            }
+        }
+        
+        function processFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('🚨 Invalid file type! I can only disappoint you with image files!');
+                return;
+            }
+            
+            const maxSize = 50 * 1024 * 1024; // 50MB
+            if (file.size > maxSize) {
+                alert(`📏 File too large: ${(file.size / 1024 / 1024).toFixed(2)}MB. Maximum size is 50MB.`);
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            // Show loading
+            document.getElementById('loadingSection').style.display = 'block';
+            document.getElementById('resultsSection').innerHTML = '';
+            
+            // Animate loading messages
+            let messageIndex = 0;
+            const messageInterval = setInterval(() => {
+                document.getElementById('loadingMessage').textContent = loadingMessages[messageIndex];
+                messageIndex = (messageIndex + 1) % loadingMessages.length;
+            }, 1500);
+            
+            // Show image preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = `
+                    <div class="image-preview">
+                        <h4 style="color: #764ba2; margin: 0 0 20px 0; font-size: 1.3rem;">📸 Your Magnificent Timepiece</h4>
+                        <img src="${e.target.result}" class="preview-image" alt="Your watch photo">
+                        <p style="font-style: italic; color: #666; margin: 20px 0 0 0;">
+                            Looking absolutely stunning! Now let me completely butcher this analysis... 🎭
+                        </p>
+                    </div>
+                `;
+                document.getElementById('resultsSection').innerHTML = preview;
+            };
+            reader.readAsDataURL(file);
+            
+            // Simulate API call (replace with actual fetch to your Flask endpoint)
+            setTimeout(() => {
+                clearInterval(messageInterval);
+                document.getElementById('loadingSection').style.display = 'none';
+                
+                // Mock response for demonstration
+                const mockResponse = {
+                    time: "3:47",
+                    confidence: 73,
+                    excuse: "Your watch appears to be experiencing an existential crisis. The hour hand is pointing to what I can only describe as 'somewhere between disappointment and confusion,' while the minute hand seems to be rebelling against conventional timekeeping principles.",
+                    technical_analysis: "After consulting my advanced neural networks (and a magic 8-ball), I've determined that your timepiece exists in a quantum superposition between several different times. Schrödinger would be proud!",
+                    confusion_level: 85
+                };
+                
+                displayResults(mockResponse);
+            }, 3000);
+        }
+        
+        function displayResults(data) {
+            const confidenceColor = data.confidence > 80 ? '#00b894' : 
+                                   data.confidence > 60 ? '#fdcb6e' : 
+                                   data.confidence > 40 ? '#e17055' : '#d63031';
+                                   
+            const confidenceEmoji = data.confidence > 90 ? '🎯' :
+                                  data.confidence > 70 ? '👍' :
+                                  data.confidence > 50 ? '🤔' :
+                                  data.confidence > 30 ? '😅' : '🤦‍♂️';
+            
+            const resultsHTML = `
+                <div class="results-section">
+                    <h3 style="text-align: center; color: #00b894; font-size: 2rem; margin: 0 0 30px 0;">
+                        🔮 Spectacular Analysis Results
+                    </h3>
+                    
+                    <div class="time-display">${data.time || '???:??'}</div>
+                    
+                    <div class="confidence-container">
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: ${data.confidence}%; background: ${confidenceColor};">
+                                ${confidenceEmoji} ${data.confidence}% Confident
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="excuse-box">
+                        <div class="excuse-title">📝 Official Excuse Department Report</div>
+                        <p class="excuse-text">${data.excuse}</p>
+                        <p style="margin: 15px 0 0 0; font-style: italic; color: #999; font-size: 0.9rem;">
+                            Case #${Math.floor(Math.random() * 9999) + 1000} - Filed under "Advanced Digital Confusion"
+                        </p>
+                    </div>
+                    
+                    <div class="technical-box">
+                        <div class="technical-title">🤖 Ultra-Scientific Technical Analysis</div>
+                        <p style="margin: 0 0 20px 0; color: #4a4a4a; font-family: 'Comic Neue', cursive; line-height: 1.6;">
+                            ${data.technical_analysis}
+                        </p>
+                        
+                        <div style="color: #764ba2;">
+                            <strong>📊 Advanced Chaos Metrics:</strong><br>
+                            • AI Confusion Level: ${data.confusion_level}%<br>
+                            • Temporal Coherence: ${Math.floor(Math.random() * 100)}%<br>
+                            • Reality Sync: ${Math.floor(Math.random() * 100)}%<br>
+                            • Magic 8-Ball Status: "Reply hazy"<br>
+                            • Usefulness Rating: ${Math.floor(Math.random() * 5)}/100<br>
+                            • Entertainment Value: ∞/10
+                        </div>
+                    </div>
+                    
+                    <div class="disclaimer">
+                        <strong>⚠️ Professional Disclaimer</strong><br><br>
+                        This analysis was performed by an AI that learned timekeeping from a broken microwave clock. 
+                        For actual time information, please consult literally anything else - a sundial, tea leaves, 
+                        or your neighbor's cat. Thank you for participating in our experiment in digital bewilderment! 🎪
+                        <br><br>
+                        <em>Side effects may include uncontrollable laughter, temporary loss of faith in technology, 
+                        and an inexplicable urge to show this to everyone you know.</em>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('resultsSection').innerHTML += resultsHTML;
+            createCelebration();
+        }
+        
+        function createCelebration() {
+            const emojis = ['🎉', '🎊', '⭐', '✨', '🌟', '💫', '🎈'];
+            
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const emoji = document.createElement('div');
+                    emoji.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                    emoji.style.cssText = `
+                        position: fixed;
+                        left: ${Math.random() * 100}%;
+                        top: -50px;
+                        font-size: ${Math.random() * 20 + 25}px;
+                        pointer-events: none;
+                        z-index: 9999;
+                        animation: celebrate 4s linear forwards;
+                    `;
+                    
+                    document.body.appendChild(emoji);
+                    setTimeout(() => emoji.remove(), 4000);
+                }, i * 200);
+            }
+            
+            if (!document.querySelector('#celebrationStyle')) {
+                const style = document.createElement('style');
+                style.id = 'celebrationStyle';
+                style.textContent = `
+                    @keyframes celebrate {
+                        to {
+                            transform: translateY(calc(100vh + 100px)) rotate(360deg);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+    </script>
+</body>
+</html>

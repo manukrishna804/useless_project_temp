@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, request, jsonify, redirect, url_for, session
+from flask import Flask, render_template, Response, request, jsonify, redirect, url_for, session, send_from_directory
 import cv2
 import numpy as np
 import threading
@@ -333,6 +333,18 @@ def home():
 def eye_detection_app():
     """Eye detection application page"""
     return render_template('index.html')
+
+@app.route('/watch-detector')
+def watch_detector_page():
+    """Watch detector fun page - requires login"""
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    return render_template('watch_detector.html')
+
+@app.route('/pucham.jpeg')
+def serve_pucham_image():
+    """Serve the pucham.jpeg image used in the watch detector page"""
+    return send_from_directory(app.root_path, 'pucham.jpeg')
 
 @app.route('/video_feed')
 def video_feed():
