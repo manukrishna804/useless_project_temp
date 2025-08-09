@@ -1,47 +1,72 @@
 <img width="3188" height="1202" alt="frame (3)" src="https://github.com/user-attachments/assets/517ad8e9-ad22-457d-9538-a9e62d137cd7" />
 
 
-# [Project Name] 🎯
+# അങ്ങനെ അങ്ങ് വിലസണ്ട ... 🎯
 
 
 ## Basic Details
-### Team Name: [Name]
+### Team Name: code warriorr
 
 
 ### Team Members
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
+- Team Lead: Manukrishna ck - GEC palakkad
+- Member 2: Abhishek s - GEC palakkad
 - Member 3: [Name] - [College]
 
 ### Project Description
-[2-3 lines about what your project does]
+This project is a hilarious twist on authentication — you can only log in if you smile 😁. Once inside, you’ll find equally “useless” OpenCV-powered features like a video that only plays when your eyes are closed and a draggable watch that shows the time in the silliest way possible. Built with Flask, OpenCV, and zero seriousness.
 
 ### The Problem (that doesn't exist)
-[What ridiculous problem are you solving?]
+Ever felt that normal logins with usernames and passwords were just too practical? Or that videos playing while your eyes are open were just too mainstream? We’re here to solve these completely non-problems with cutting-edge, absolutely unnecessary technology.
 
 ### The Solution (that nobody asked for)
-[How are you solving it? Keep it fun!]
+We replaced boring passwords with smile-powered facial recognition, because why type when you can grin? Then we took videos and made them only watchable when you can’t see them (eyes closed). And for the grand finale, we gave you a draggable watch that tells time in the most ridiculous way possible. All thanks to Flask, OpenCV, and questionable life choices.
 
 ## Technical Details
+
 ### Technologies/Components Used
 For Software:
-- [Languages used]
-- [Frameworks used]
-- [Libraries used]
-- [Tools used]
+    -Languages used: Python, HTML, CSS, JavaScript
+
+    -Frameworks used: Flask
+
+    -Libraries used: OpenCV, NumPy
+
+    -Tools used: Git, GitHub, Web Browser, Code Editor (VS Code)
 
 For Hardware:
-- [List main components]
-- [List specifications]
-- [List tools required]
+----Main components: Webcam (built-in or external)
+
+-----Specifications: Minimum 720p resolution, 30fps capture rate recommended
+
+-----Tools required: Computer/Laptop, Stable lighting setup, A big smile 😁
+
+Ask ChatGPT
+
 
 ### Implementation
 For Software:
 # Installation
-[commands]
+# Clone the repository
+git clone https://github.com/manukrishna804/useless_project_temp.git
+cd useless_project_temp
+
+# (Optional) Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate    # On Linux/Mac
+.venv\Scripts\activate       # On Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
 
 # Run
-[commands]
+# Start the Flask server
+python app.py
+
+# Open your browser and go to
+http://127.0.0.1:5000
+
 
 ### Project Documentation
 For Software:
