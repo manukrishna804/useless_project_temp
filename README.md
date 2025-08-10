@@ -106,14 +106,17 @@ For Hardware:
 ![Final](Add photo of final product here)
 *Explain the final build*
 
+
 ### Project Demo
-# Video
-![video demo](video/n1.mp4)
-*Explain what the video demonstrates*
 
-# Additional Demos
+#### Video 1
+![Project Demo Video 1](video/demo_1.mp4)  
+*This video demonstrates the smile login and blink-to-play video feature.*
 
-![video](video/n2.mp4)
+#### Additional Demo
+![Project Demo Video 2](video/n2.mp4)  
+*This video demonstrates the funny clock feature.*
+
 
 ## Team Contributions
 - [manu]: [open cv]
